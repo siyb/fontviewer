@@ -87,13 +87,9 @@ set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
 
 # configure default font
 .boxes.fontsizes set 12
-set defaultFont [lindex $families 0]
+set defaultFont [font create defaultFont -family [lindex $families 0]]
 .boxes.fonts set $defaultFont
 set fonts($defaultFont) [font create -family $defaultFont -size 12]
-
-# display
-pack [ttk::label .display -textvariable text] -anchor w
-.display configure -font $fonts($defaultFont)
 
 bind .boxes.fonts <<ComboboxSelected>> {
 	setFont
@@ -134,7 +130,7 @@ proc setFont {} {
 	} else {
 		font configure $fonts($font) -overstrike $overstrike -underline $underline -weight $bolds -slant $italics
 	}
-	.display configure -font $fonts($font)
+	.textinput.field configure -font $fonts($font)
 	if {[winfo exists .textPreview.text]} {
 		.textPreview.text configure -font $fonts($font)
 	}
@@ -142,13 +138,13 @@ proc setFont {} {
 
 proc setSize {} {
 	set size [.boxes.fontsizes get]
-	set font [lindex [.display configure -font] end]
+	set font [lindex [.textinput.field configure -font] end]
 	font configure $font -size $size 
 }
 
 proc toggleBold {} {
 	global bold b
-	set font [lindex [.display configure -font] end]
+	set font [lindex [.textinput.field configure -font] end]
 	if {[font configure $font -weight] eq "normal"} {
 		font configure $font -weight bold
 		set bold 1
@@ -162,7 +158,7 @@ proc toggleBold {} {
 
 proc toggleItalic {} {
 	global italic b
-	set font [lindex [.display configure -font] end]
+	set font [lindex [.textinput.field configure -font] end]
 	if {[font configure $font -slant] eq "roman"} {
 		font configure $font -slant italic
 		set italic 1
@@ -176,7 +172,7 @@ proc toggleItalic {} {
 
 proc toggleUnderline {} {
 	global underline b
-	set font [lindex [.display configure -font] end]
+	set font [lindex [.textinput.field configure -font] end]
 	if {[font configure $font -underline]} {
 		font configure $font -underline 0
 		set underline 0
@@ -190,7 +186,7 @@ proc toggleUnderline {} {
 
 proc toggleOverstrike {} {
 	global overstrike b
-	set font [lindex [.display configure -font] end]
+	set font [lindex [.textinput.field configure -font] end]
 	if {[font configure $font -overstrike]} {
 		font configure $font -overstrike 0
 		set overstrike 0
