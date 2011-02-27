@@ -108,8 +108,8 @@ proc preview {} {
 	if {![winfo exists .textPreview]} {
 		set font [.boxes.fonts get]
 		toplevel .textPreview
-		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
 		pack [scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
+		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
 	}
 	if {![file exists $path]} { return }
 	.textPreview.text configure -state normal
