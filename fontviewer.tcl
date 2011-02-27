@@ -83,11 +83,11 @@ set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
 # text input
 pack [frame .textinput] -side top -fill x -anchor w
 pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [entry .textinput.field -textvariable text] -side right -fill x -anchor w -expand 1
+pack [entry .textinput.field -width 0 -textvariable text] -side left -fill x -anchor w 
 
 # configure default font
 .boxes.fontsizes set 12
-set defaultFont [font create defaultFont -family [lindex $families 0]]
+set defaultFont [lindex $families 0]
 .boxes.fonts set $defaultFont
 set fonts($defaultFont) [font create -family $defaultFont -size 12]
 
@@ -99,15 +99,16 @@ bind .boxes.fontsizes <<ComboboxSelected>> {
 }
 
 proc preview {} {
-	global env
+	global env fonts
 	set path [tk_getOpenFile -initialdir $env(HOME) -multiple false -title "File Preview" \
 		-filetypes {
 			{{All Files} *}
 		}]
 	if {$path eq ""} { return }
 	if {![winfo exists .textPreview]} {
+		set font [.boxes.fonts get]
 		toplevel .textPreview
-		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set}] -side left -fill both -expand 1
+		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
 		pack [scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
 	}
 	if {![file exists $path]} { return }
@@ -135,8 +136,9 @@ proc setFont {} {
 		.textPreview.text configure -font $fonts($font)
 	}
 }
-
+setFont
 proc setSize {} {
+	global fonts 
 	set size [.boxes.fontsizes get]
 	set font [lindex [.textinput.field configure -font] end]
 	font configure $font -size $size 
