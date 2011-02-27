@@ -106,7 +106,6 @@ proc preview {} {
 	global env
 	set path [tk_getOpenFile -initialdir $env(HOME) -multiple false -title "File Preview" \
 		-filetypes {
-			{{Text Files} {.txt}}
 			{{All Files} *}
 		}]
 	if {$path eq ""} { return }
