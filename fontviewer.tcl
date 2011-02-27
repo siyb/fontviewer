@@ -64,11 +64,6 @@ set italic 0
 set underline 0
 set overstrike 0
 
-# text input
-pack [frame .textinput] -side top -fill x -anchor w
-pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [entry .textinput.field -textvariable text] -side right -fill x -anchor w -expand 1
-
 set families [lsort [font families]]
 pack [frame .boxes] -side top -anchor w
 pack [ttk::combobox .boxes.fonts -values $families -state readonly] -side left
@@ -84,6 +79,11 @@ set b(overstrike) [button .buttons.overstrike -text "O" -command { toggleOverstr
 pack $b(bold) $b(italic) $b(underline) $b(overstrike) -side left
 pack [button .buttons.openFile -text "Preview File" -command { preview }]
 set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
+
+# text input
+pack [frame .textinput] -side top -fill x -anchor w
+pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
+pack [entry .textinput.field -textvariable text] -side right -fill x -anchor w -expand 1
 
 # configure default font
 .boxes.fontsizes set 12
