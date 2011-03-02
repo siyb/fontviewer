@@ -68,7 +68,7 @@ set families [lsort [font families]]
 pack [frame .boxes] -side top -anchor w
 pack [ttk::combobox .boxes.fonts -values $families -state readonly] -side left
 for {set i 1} {$i <= $maxSize} {incr i} { lappend slist $i }
-pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left 
+pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
 # font modifier
 pack [frame .buttons] -side top -anchor w
@@ -83,7 +83,7 @@ set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
 # text input
 pack [frame .textinput] -side top -fill x -anchor w
 pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [entry .textinput.field -width 0 -textvariable text] -side left -fill x -anchor w 
+pack [entry .textinput.field -width 0 -textvariable text] -side left -fill x -anchor w
 
 # configure default font
 .boxes.fontsizes set 12
@@ -138,10 +138,10 @@ proc setFont {} {
 }
 setFont
 proc setSize {} {
-	global fonts 
+	global fonts
 	set size [.boxes.fontsizes get]
 	set font [lindex [.textinput.field configure -font] end]
-	font configure $font -size $size 
+	font configure $font -size $size
 }
 
 proc toggleBold {} {
