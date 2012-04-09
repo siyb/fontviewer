@@ -53,9 +53,6 @@ set text "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890?"
 # set the maximum displayable size of the font, 72 should be sufficient :)
 set maxSize 72
 
-# the color of the button whose modifier is active
-set buttonHightlight green
-
 #
 # Code
 #
@@ -63,6 +60,10 @@ set bold 0
 set italic 0
 set underline 0
 set overstrike 0
+
+if {"clam" in [ttk::style theme names]} {
+  ttk::style theme use clam
+}
 
 set families [lsort [font families]]
 pack [frame .boxes] -side top -anchor w
@@ -72,12 +73,12 @@ pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
 # font modifier
 pack [frame .buttons] -side top -anchor w
-set b(bold) [button .buttons.bold -text "B" -command { toggleBold } -width 1]
-set b(italic) [button .buttons.italic -text "I" -command { toggleItalic } -width 1]
-set b(underline) [button .buttons.underline -text "U" -command { toggleUnderline } -width 1]
-set b(overstrike) [button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 1]
+set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 1]
+set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 1]
+set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 1]
+set b(overstrike) [ttk::button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 1]
 pack $b(bold) $b(italic) $b(underline) $b(overstrike) -side left
-pack [button .buttons.openFile -text "Preview File" -command { preview }]
+pack [ttk::button .buttons.openFile -text "Preview File" -command { preview }]
 set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
 
 # text input
@@ -203,8 +204,8 @@ proc toggleOverstrike {} {
 proc toggleButtonSet {button on} {
 	global b buttonHightlight
 	if {$on} {
-		$button configure -bg $buttonHightlight -activebackground $buttonHightlight
+		$button state {pressed !focus}
 	} {
-		$button configure -bg $b(defaultColor) -activebackground $b(defaultColor)
+		$button state {!pressed !focus}
 	}
 }
