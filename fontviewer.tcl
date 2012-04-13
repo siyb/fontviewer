@@ -119,8 +119,7 @@ proc preview {} {
 	set data [read [set fl [open $path r]]];close $fl
 	.textPreview.text delete 0.0 end
 	.textPreview.text insert 0.0 $data
-	.textPreview.text configure -state disabled 
-
+	.textPreview.text configure -state disabled
 }
 
 proc setFont {} {
@@ -139,7 +138,7 @@ proc setFont {} {
 		.textPreview.text configure -font $fonts($font)
 	}
 }
-setFont
+
 proc setSize {} {
 	global fonts
 	set size [.boxes.fontsizes get]
@@ -218,7 +217,7 @@ proc adjustWidth {args} {
 }
 
 proc setTheme {} {
-  global tcl_platform debug
+  global tcl_platform
 
   set themes {tile-qt tile-gtk clam}
 
@@ -245,6 +244,7 @@ proc setTheme {} {
 }
 
 
-# Auto-select theme
+# Initialize theme and font
 
 setTheme
+setFont
