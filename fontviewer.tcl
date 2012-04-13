@@ -56,6 +56,8 @@ set maxSize 72
 #
 # Code
 #
+package require Tk 8.5
+
 set bold 0
 set italic 0
 set underline 0
@@ -73,18 +75,18 @@ pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
 # font modifier
 pack [frame .buttons] -side top -anchor w
-set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 1]
-set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 1]
-set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 1]
-set b(overstrike) [ttk::button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 1]
+set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 3]
+set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 3]
+set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 3]
+set b(overstrike) [ttk::button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 3]
 pack $b(bold) $b(italic) $b(underline) $b(overstrike) -side left
 pack [ttk::button .buttons.openFile -text "Preview File" -command { preview }]
-set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
 
 # text input
-pack [frame .textinput] -side top -fill x -anchor w
-pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [entry .textinput.field -width 0 -textvariable text] -side left -fill x -anchor w
+pack [ttk::frame .textinput] -side top -fill x -anchor w
+pack [ttk::label .textinput.label -text "Enter text here:"] -side left -anchor w
+pack [ttk::entry .textinput.field -width [string length $text] -textvariable text] -side left -fill x -anchor w
+trace add variable text write adjustWidth
 
 # configure default font
 .boxes.fontsizes set 12
@@ -109,7 +111,7 @@ proc preview {} {
 	if {![winfo exists .textPreview]} {
 		set font [.boxes.fonts get]
 		toplevel .textPreview
-		pack [scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
+		pack [ttk::scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
 		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
 	}
 	if {![file exists $path]} { return }
@@ -208,4 +210,9 @@ proc toggleButtonSet {button on} {
 	} {
 		$button state {!pressed !focus}
 	}
+}
+
+proc adjustWidth {args} {
+	global text
+	.textinput.field configure -width [string length $text]
 }
