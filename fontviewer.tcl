@@ -28,6 +28,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # History
+# Version 0.5.2
+#
+# - Some visual enhancements
+#
 # Version 0.5
 # 
 # - Added file preview option
