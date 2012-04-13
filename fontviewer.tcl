@@ -53,16 +53,19 @@ set text "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890?"
 # set the maximum displayable size of the font, 72 should be sufficient :)
 set maxSize 72
 
-# the color of the button whose modifier is active
-set buttonHightlight green
-
 #
 # Code
 #
+package require Tk 8.5
+
 set bold 0
 set italic 0
 set underline 0
 set overstrike 0
+
+if {"clam" in [ttk::style theme names]} {
+  ttk::style theme use clam
+}
 
 set families [lsort [font families]]
 pack [frame .boxes] -side top -anchor w
@@ -72,18 +75,18 @@ pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
 # font modifier
 pack [frame .buttons] -side top -anchor w
-set b(bold) [button .buttons.bold -text "B" -command { toggleBold } -width 1]
-set b(italic) [button .buttons.italic -text "I" -command { toggleItalic } -width 1]
-set b(underline) [button .buttons.underline -text "U" -command { toggleUnderline } -width 1]
-set b(overstrike) [button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 1]
+set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 3]
+set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 3]
+set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 3]
+set b(overstrike) [ttk::button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 3]
 pack $b(bold) $b(italic) $b(underline) $b(overstrike) -side left
-pack [button .buttons.openFile -text "Preview File" -command { preview }]
-set b(defaultColor) #d9d9d9;# dirty hack, color might be different -> theme ;)
+pack [ttk::button .buttons.openFile -text "Preview File" -command { preview }]
 
 # text input
-pack [frame .textinput] -side top -fill x -anchor w
-pack [label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [entry .textinput.field -width 0 -textvariable text] -side left -fill x -anchor w
+pack [ttk::frame .textinput] -side top -fill x -anchor w
+pack [ttk::label .textinput.label -text "Enter text here:"] -side left -anchor w
+pack [ttk::entry .textinput.field -width [string length $text] -textvariable text] -side left -fill x -anchor w
+trace add variable text write adjustWidth
 
 # configure default font
 .boxes.fontsizes set 12
@@ -108,7 +111,7 @@ proc preview {} {
 	if {![winfo exists .textPreview]} {
 		set font [.boxes.fonts get]
 		toplevel .textPreview
-		pack [scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
+		pack [ttk::scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
 		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
 	}
 	if {![file exists $path]} { return }
@@ -203,8 +206,42 @@ proc toggleOverstrike {} {
 proc toggleButtonSet {button on} {
 	global b buttonHightlight
 	if {$on} {
-		$button configure -bg $buttonHightlight -activebackground $buttonHightlight
+		$button state {pressed !focus}
 	} {
-		$button configure -bg $b(defaultColor) -activebackground $b(defaultColor)
+		$button state {!pressed !focus}
 	}
 }
+
+proc adjustWidth {args} {
+	global text
+	.textinput.field configure -width [string length $text]
+}
+
+proc setTheme {} {
+  global tcl_platform
+
+  set themes {tile-qt tile-gtk clam}
+
+  if {$tcl_platform(platform) eq "windows"} {
+    lappend themes winnative
+    if {$tcl_platform(osVersion) >= 5.1} {
+      lappend themes winxpnative
+    }
+    if {$tcl_platform(osVersion) >= 6.0} {
+      lappend themes vista
+    }
+  }
+
+  if {$tcl_platform(platform) eq "macintosh" || $tcl_platform(os) eq "Darwin"} {
+    lappend themes aqua
+  }
+
+  foreach theme [lreverse $themes] {
+    if {$theme ni [ttk::themes]} { continue }
+    ttk::style theme use $theme
+  }
+}
+
+# Auto-select theme
+
+setTheme
