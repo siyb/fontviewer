@@ -67,18 +67,14 @@ set italic 0
 set underline 0
 set overstrike 0
 
-if {"clam" in [ttk::style theme names]} {
-  ttk::style theme use clam
-}
-
 set families [lsort [font families]]
-pack [frame .boxes] -side top -anchor w
+pack [ttk::frame .boxes] -side top -anchor w
 pack [ttk::combobox .boxes.fonts -values $families -state readonly] -side left
 for {set i 1} {$i <= $maxSize} {incr i} { lappend slist $i }
 pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
 # font modifier
-pack [frame .buttons] -side top -anchor w
+pack [ttk::frame .buttons] -side top -anchor w
 set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 3]
 set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 3]
 set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 3]
@@ -123,8 +119,7 @@ proc preview {} {
 	set data [read [set fl [open $path r]]];close $fl
 	.textPreview.text delete 0.0 end
 	.textPreview.text insert 0.0 $data
-	.textPreview.text configure -state disabled 
-
+	.textPreview.text configure -state disabled
 }
 
 proc setFont {} {
@@ -143,7 +138,7 @@ proc setFont {} {
 		.textPreview.text configure -font $fonts($font)
 	}
 }
-setFont
+
 proc setSize {} {
 	global fonts
 	set size [.boxes.fontsizes get]
@@ -241,11 +236,15 @@ proc setTheme {} {
   }
 
   foreach theme [lreverse $themes] {
-    if {$theme ni [ttk::themes]} { continue }
-    ttk::style theme use $theme
+    if {$theme in [ttk::themes]} {
+      ttk::style theme use $theme
+      break
+    }
   }
 }
 
-# Auto-select theme
+
+# Initialize theme and font
 
 setTheme
+setFont
