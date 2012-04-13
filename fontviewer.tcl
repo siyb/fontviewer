@@ -216,3 +216,32 @@ proc adjustWidth {args} {
 	global text
 	.textinput.field configure -width [string length $text]
 }
+
+proc setTheme {} {
+  global tcl_platform
+
+  set themes {tile-qt tile-gtk clam}
+
+  if {$tcl_platform(platform) eq "windows"} {
+    lappend themes winnative
+    if {$tcl_platform(osVersion) >= 5.1} {
+      lappend themes winxpnative
+    }
+    if {$tcl_platform(osVersion) >= 6.0} {
+      lappend themes vista
+    }
+  }
+
+  if {$tcl_platform(platform) eq "macintosh" || $tcl_platform(os) eq "Darwin"} {
+    lappend themes aqua
+  }
+
+  foreach theme [lreverse $themes] {
+    if {$theme ni [ttk::themes]} { continue }
+    ttk::style theme use $theme
+  }
+}
+
+# Auto-select theme
+
+setTheme
