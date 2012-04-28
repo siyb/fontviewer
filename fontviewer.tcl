@@ -61,6 +61,7 @@ set maxSize 72
 # Code
 #
 package require Tk 8.5
+package require XTk
 
 set bold 0
 set italic 0
@@ -68,48 +69,38 @@ set underline 0
 set overstrike 0
 
 set families [lsort [font families]]
-pack [ttk::frame .boxes] -side top -anchor w
-pack [ttk::combobox .boxes.fonts -values $families -state readonly] -side left
 for {set i 1} {$i <= $maxSize} {incr i} { lappend slist $i }
-pack [ttk::combobox .boxes.fontsizes -values $slist -state readonly] -side left
 
-# font modifier
-pack [ttk::frame .buttons] -side top -anchor w
-set b(bold) [ttk::button .buttons.bold -text "B" -command { toggleBold } -width 3]
-set b(italic) [ttk::button .buttons.italic -text "I" -command { toggleItalic } -width 3]
-set b(underline) [ttk::button .buttons.underline -text "U" -command { toggleUnderline } -width 3]
-set b(overstrike) [ttk::button .buttons.overstrike -text "O" -command { toggleOverstrike } -width 3]
-pack $b(bold) $b(italic) $b(underline) $b(overstrike) -side left
-pack [ttk::button .buttons.openFile -text "Preview File" -command { preview }]
+set genCode [xtk::load ./fontviewer.xml]
+puts $genCode
+xtk::run $genCode
 
-# text input
-pack [ttk::frame .textinput] -side top -fill x -anchor w
-pack [ttk::label .textinput.label -text "Enter text here:"] -side left -anchor w
-pack [ttk::entry .textinput.field -width [string length $text] -textvariable text] -side left -fill x -anchor w
 trace add variable text write adjustWidth
 
 # configure default font
-.boxes.fontsizes set 12
+$fontSizes set 12
 set defaultFont [lindex $families 0]
-.boxes.fonts set $defaultFont
+$fontTypes set $defaultFont
 set fonts($defaultFont) [font create -family $defaultFont -size 12]
 
-bind .boxes.fonts <<ComboboxSelected>> {
-	setFont
-}
-bind .boxes.fontsizes <<ComboboxSelected>> {
-	setSize
+proc bindCallback {path args} {
+	global fontSizes fontTypes
+	if {$path eq $fontTypes} {
+		setFont
+	} elseif {$path eq $fontSizes} {
+		setSize
+	}
 }
 
 proc preview {} {
-	global env fonts
+	global env fonts fontTypes
 	set path [tk_getOpenFile -initialdir $env(HOME) -multiple false -title "File Preview" \
 		-filetypes {
 			{{All Files} *}
 		}]
 	if {$path eq ""} { return }
 	if {![winfo exists .textPreview]} {
-		set font [.boxes.fonts get]
+		set font [$fontTypes get]
 		toplevel .textPreview
 		pack [ttk::scrollbar .textPreview.scroll -command {.textPreview.text yview}] -side right -fill y
 		pack [text .textPreview.text -fg black -wrap word -yscrollcommand {.textPreview.scroll set} -font $fonts($font)] -side left -fill both -expand 1
@@ -123,9 +114,9 @@ proc preview {} {
 }
 
 proc setFont {} {
-	global fonts bold italic underline overstrike
-	set font [.boxes.fonts get]
-	set size [.boxes.fontsizes get]
+	global fonts bold italic underline overstrike fontSizes fontTypes
+	set font [$fontTypes get]
+	set size [$fontSizes get]
 	if {$bold} { set bolds "bold" } { set bolds "normal" }
 	if {$italic} { set italics "italic" } { set italics "roman" }
 	if {![info exists fonts($font)]} {
@@ -133,7 +124,7 @@ proc setFont {} {
 	} else {
 		font configure $fonts($font) -overstrike $overstrike -underline $underline -weight $bolds -slant $italics
 	}
-	.textinput.field configure -font $fonts($font)
+	$::textfield configure -font $fonts($font)
 	if {[winfo exists .textPreview.text]} {
 		.textPreview.text configure -font $fonts($font)
 	}
@@ -141,14 +132,14 @@ proc setFont {} {
 
 proc setSize {} {
 	global fonts
-	set size [.boxes.fontsizes get]
-	set font [lindex [.textinput.field configure -font] end]
+	set size [$::fontSizes get]
+	set font [lindex [$::textfield configure -font] end]
 	font configure $font -size $size
 }
 
 proc toggleBold {} {
 	global bold b
-	set font [lindex [.textinput.field configure -font] end]
+	set font [lindex [$::textfield configure -font] end]
 	if {[font configure $font -weight] eq "normal"} {
 		font configure $font -weight bold
 		set bold 1
@@ -162,7 +153,7 @@ proc toggleBold {} {
 
 proc toggleItalic {} {
 	global italic b
-	set font [lindex [.textinput.field configure -font] end]
+	set font [lindex [$::textfield configure -font] end]
 	if {[font configure $font -slant] eq "roman"} {
 		font configure $font -slant italic
 		set italic 1
@@ -176,7 +167,7 @@ proc toggleItalic {} {
 
 proc toggleUnderline {} {
 	global underline b
-	set font [lindex [.textinput.field configure -font] end]
+	set font [lindex [$::textfield configure -font] end]
 	if {[font configure $font -underline]} {
 		font configure $font -underline 0
 		set underline 0
@@ -190,7 +181,7 @@ proc toggleUnderline {} {
 
 proc toggleOverstrike {} {
 	global overstrike b
-	set font [lindex [.textinput.field configure -font] end]
+	set font [lindex [$::textfield configure -font] end]
 	if {[font configure $font -overstrike]} {
 		font configure $font -overstrike 0
 		set overstrike 0
@@ -213,7 +204,7 @@ proc toggleButtonSet {button on} {
 
 proc adjustWidth {args} {
 	global text
-	.textinput.field configure -width [string length $text]
+	$::textfield configure -width [string length $text]
 }
 
 proc setTheme {} {

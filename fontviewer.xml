@@ -1,0 +1,37 @@
+<xtk namespace="::" ttk="1">
+	<pack side="top" anchor="w">
+		<frame>
+			<pack side="left">
+				<combobox values="$slist" state="readonly" variable="fontSizes">
+					<bind event="ComboboxSelected" virtual="1" />
+				</combobox>
+				<combobox values="$families" state="readonly" variable="fontTypes">
+					<bind event="ComboboxSelected" virtual="1" />	
+				</combobox>
+			</pack>
+		</frame>
+	</pack>
+	<pack side="top" anchor="w">
+		<frame>
+			<pack side="left">
+				<button text="B" command="toggleBold" width="3" variable="b(bold)" />
+				<button text="I" command="toggleItalic" width="3" variable="b(italic)" />
+				<button text="U" command="toggleUnderline" width="3" variable="b(underline)" />
+			</pack>
+			<pack>
+				<button text="Preview File" command="preview" />
+			</pack>
+		</frame>
+	</pack>
+	<pack side="top" fill="x" anchor="w">
+		<frame>
+			<pack side="left" anchor="w">
+				<label text="Enter text here:" />
+			</pack>
+			<pack side="left" fill="x" anchor="w">
+				<entry variable="textfield" width="[string length $text]" textvariable="text" />
+			</pack>
+		</frame>
+	</pack>
+</xtk>
+
